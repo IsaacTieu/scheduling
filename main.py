@@ -88,13 +88,14 @@ if __name__ == "__main__":
     for event in c.events:
         if event.begin < compare_date:
             continue
-
+        
+        # +3 is a hardcoded fix for some weird time reading error
+        # start_hour without +3 is 3 hours behind for some reason
         begin = event.begin.shift(hours=+3)
         end = event.end.shift(hours=+3)
 
         shift_type = ''
-        # +3 is a hardcoded fix for some weird time reading error
-        # start_hour without +3 is 3 hours behind for some reason
+
         start_hour = begin.to('America/Los_Angeles').hour
         end_hour = end.to('America/Los_Angeles').hour
         # start_hour = begin.hour
@@ -109,6 +110,7 @@ if __name__ == "__main__":
         location = event.name.split(" - ")[-1].strip()
         role = event.name.split(" - ")[1].strip()
 
+        # Temp bypass for testing
         if not name == "Xiang Meng":
             continue
 
