@@ -67,7 +67,7 @@ def create_shift_event(title: str, location: str, \
 
     # create event
     event = service.events().insert(
-        calendarId='primary',
+        calendarId=SHARED_CALENDAR_ID,
         body=event,
         sendUpdates='all'  # send email invites
     ).execute()
@@ -83,8 +83,7 @@ if __name__ == "__main__":
 
     compare_date = arrow.get(first_year, first_month, first_day)
 
-    # TODO Make capability for detecting a timestamp as opening/closing
-
+    # loop through every single event in Sling scheduling
     for event in c.events:
         if event.begin < compare_date:
             continue
@@ -98,42 +97,31 @@ if __name__ == "__main__":
 
         start_hour = begin.to('America/Los_Angeles').hour
         end_hour = end.to('America/Los_Angeles').hour
-        # start_hour = begin.hour
-        # end_hour = end.hour
-
-        if start_hour <= 10:
-            shift_type = 'Opening Shift'
-        elif end_hour >= 16:
-            shift_type = 'Closing Shift'
 
         name = event.name.split(" - ", 1)[0].strip()
         location = event.name.split(" - ")[-1].strip()
         role = event.name.split(" - ")[1].strip()
 
         # Temp bypass for testing
-        if not name == "Xiang Meng":
+        if not name == TESTING_NAME:
             continue
 
+        description = event.description
+
+        if "closing" in description.lower():
+            shift_type = "Closing Shift"
+        elif "opening" in description.lower():
+            shift_type = "Opening Shift"
+        
         if shift_type:
             title = '[' + location.upper() + ']' +  ' ' + role + ' - ' + name + ' - ' + shift_type
         else:
             title = '[' + location.upper() + ']' +  ' ' + role + ' - ' + name
 
-        description = event.description
-        #print(event.name)
-        # print(title)
-        # print(f"begin: {event.begin}")
-        # print(f"begin hour: {start_hour}")
-        # print(f"end: {event.end}")
-        # print(f"end hour: {end_hour}")
-
-
         emails = []
         emails.append(EMAILS[name])
-        emails.append(JASON)
 
         try:
             create_shift_event(title, location, description, begin, end, emails)
         except Exception as e:
-            print(f'Error sending schedule to {event.name} at {event.begin}: {e}')
-
+            print(f'Error sending schedule to {event.name} at {start_hour}: {e}')
