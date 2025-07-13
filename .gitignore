@@ -2,3 +2,4 @@ config.py
 /__pycache__
 credentials.json
 token.pickle
+shifts-export.csv
