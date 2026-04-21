@@ -189,7 +189,7 @@ def parse_day_schedule(cell_content, name, date_obj):
             continue
             
         # Check if this line contains a time range for a shift
-        if re.match(r'^\d+:\d+', line) and ' - ' in line and '•' in line and 'Proctor' not in line:
+        if re.match(r'^\d+:\d+', line) and ' - ' in line and 'Proctor' not in line:
             # This is a shift time line
             try:
                 start_time, end_time = parse_time_string(line)
